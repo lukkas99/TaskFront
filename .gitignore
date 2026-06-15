@@ -37,3 +37,6 @@ dist-ssr
 coverage
 *.coverage
 .nyc_output
+
+# Local documentation
+docs_local/
