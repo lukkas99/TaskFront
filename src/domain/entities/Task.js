@@ -3,17 +3,19 @@
  * Encapsula a lógica de negócio da tarefa
  */
 export class Task {
-  constructor(id, title, done = false) {
+  constructor(id, title, done = false, category = 3, priority = 1) {
     this.id = id;
     this.title = title;
     this.done = done;
+    this.category = category;
+    this.priority = priority;
   }
 
   /**
    * Cria uma tarefa a partir de dados da API
    */
   static fromApiResponse(data) {
-    return new Task(data.id, data.title, data.done);
+    return new Task(data.id, data.title, data.done, data.category, data.priority);
   }
 
   /**
@@ -23,6 +25,8 @@ export class Task {
     return {
       title: this.title,
       done: this.done,
+      category: this.category,
+      priority: this.priority,
     };
   }
 
@@ -30,21 +34,21 @@ export class Task {
    * Marca tarefa como concluída
    */
   markAsDone() {
-    return new Task(this.id, this.title, true);
+    return new Task(this.id, this.title, true, this.category, this.priority);
   }
 
   /**
    * Marca tarefa como não concluída
    */
   markAsNotDone() {
-    return new Task(this.id, this.title, false);
+    return new Task(this.id, this.title, false, this.category, this.priority);
   }
 
   /**
    * Alterna o status de conclusão
    */
   toggle() {
-    return new Task(this.id, this.title, !this.done);
+    return new Task(this.id, this.title, !this.done, this.category, this.priority);
   }
 
   /**

@@ -22,7 +22,11 @@ export class HttpClient {
     // Request interceptor
     this.client.interceptors.request.use(
       (config) => {
-        // Aqui você pode adicionar tokens, etc
+        // Adiciona token de autenticação se existir
+        const token = localStorage.getItem("authToken");
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
         return config;
       },
       (error) => Promise.reject(error)

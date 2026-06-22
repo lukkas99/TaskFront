@@ -1,7 +1,9 @@
 import { HttpClient } from "../http/HttpClient";
 import { TaskRepository } from "../repositories/TaskRepository";
 import { LocalStorageTaskRepository } from "../repositories/LocalStorageTaskRepository";
+import { AuthRepository } from "../repositories/AuthRepository";
 import { TaskService } from "../../application/services/TaskService";
+import { AuthService } from "../../application/services/AuthService";
 import { API_CONFIG } from "../../config/constants";
 
 /**
@@ -50,6 +52,22 @@ class DependencyContainer {
       this._instances.taskService = new TaskService(taskRepository);
     }
     return this._instances.taskService;
+  }
+
+  _createAuthRepository() {
+    if (!this._instances.authRepository) {
+      const httpClient = this._createHttpClient();
+      this._instances.authRepository = new AuthRepository(httpClient);
+    }
+    return this._instances.authRepository;
+  }
+
+  getAuthService() {
+    if (!this._instances.authService) {
+      const authRepository = this._createAuthRepository();
+      this._instances.authService = new AuthService(authRepository);
+    }
+    return this._instances.authService;
   }
 }
 

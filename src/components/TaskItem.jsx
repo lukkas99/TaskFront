@@ -1,3 +1,7 @@
+import Badge from "./Badge";
+import { CategoryLabels, PriorityLabels, CategoryColors, PriorityColors } from "../domain/enums/TaskEnums";
+import { MdDeleteOutline } from "react-icons/md";
+
 /**
  * Componente de item de tarefa
  * Responsabilidade: Apresentação de uma tarefa individual
@@ -51,9 +55,8 @@ function TaskItem({
       onDrop={handleDrop}
       onDragEnd={handleDragEnd}
       style={{ cursor: "move" }}
-    >
-      <span className="task-title">{task.title}</span>
-      <div className="task-actions">
+          >
+      <div className="task-checkbox">
         <button 
           className="btn-toggle" 
           onClick={handleToggle}
@@ -61,12 +64,30 @@ function TaskItem({
         >
           {task.done ? "✅" : "⬜"}
         </button>
+      </div>
+
+      <div className="task-title-wrapper">
+        <span className="task-title">{task.title}</span>
+      </div>
+
+      <div className="task-badges">
+        <Badge 
+          label={CategoryLabels[task.category]} 
+          color={CategoryColors[task.category]} 
+        />
+        <Badge 
+          label={PriorityLabels[task.priority]} 
+          color={PriorityColors[task.priority]} 
+        />
+      </div>
+
+      <div className="task-actions">
         <button 
           className="btn-delete" 
           onClick={handleDelete}
           aria-label="Excluir tarefa"
         >
-          🗑️
+          <MdDeleteOutline size={20} />
         </button>
       </div>
     </li>

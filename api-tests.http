@@ -1,0 +1,249 @@
+### Testes da API de Autenticação
+### Use este arquivo no REST Client (VS Code Extension) ou Postman
+
+### Variáveis
+@baseUrl = http://localhost:5340
+@token = seu-token-aqui
+
+###############################################
+### 1. CADASTRO DE USUÁRIO
+###############################################
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "email": "joao@email.com",
+  "password": "123456"
+}
+
+# Resposta esperada:
+# {
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "user": {
+#     "id": 1,
+#     "name": "João Silva",
+#     "email": "joao@email.com"
+#   }
+# }
+
+###############################################
+### 2. LOGIN
+###############################################
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@email.com",
+  "password": "123456"
+}
+
+# Resposta esperada:
+# {
+#   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+#   "user": {
+#     "id": 1,
+#     "name": "João Silva",
+#     "email": "joao@email.com"
+#   }
+# }
+
+###############################################
+### 3. BUSCAR USUÁRIO ATUAL
+###############################################
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
+
+# Resposta esperada:
+# {
+#   "id": 1,
+#   "name": "João Silva",
+#   "email": "joao@email.com"
+# }
+
+###############################################
+### 4. LISTAR TASKS DO USUÁRIO
+###############################################
+GET {{baseUrl}}/api/tasks
+Authorization: Bearer {{token}}
+
+# Resposta esperada:
+# [
+#   {
+#     "id": 1,
+#     "title": "Minha tarefa",
+#     "isCompleted": false,
+#     "category": 0,
+#     "priority": 1,
+#     "order": 0,
+#     "userId": 1,
+#     "createdAt": "2024-01-01T00:00:00Z"
+#   }
+# ]
+
+###############################################
+### 5. CRIAR NOVA TASK
+###############################################
+POST {{baseUrl}}/api/tasks
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Nova tarefa do usuário",
+  "isCompleted": false,
+  "category": 0,
+  "priority": 1,
+  "order": 0
+}
+
+# Nota: UserId será automaticamente preenchido pelo backend
+
+###############################################
+### 6. ATUALIZAR TASK
+###############################################
+PUT {{baseUrl}}/api/tasks/1
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Tarefa atualizada",
+  "isCompleted": true,
+  "category": 0,
+  "priority": 2,
+  "order": 0
+}
+
+# Só funciona se a task pertencer ao usuário autenticado
+
+###############################################
+### 7. DELETAR TASK
+###############################################
+DELETE {{baseUrl}}/api/tasks/1
+Authorization: Bearer {{token}}
+
+# Só funciona se a task pertencer ao usuário autenticado
+
+###############################################
+### TESTE DE SEGURANÇA
+###############################################
+
+### Tentar acessar tasks sem token (deve falhar)
+GET {{baseUrl}}/api/tasks
+
+# Resposta esperada: 401 Unauthorized
+
+### Tentar cadastrar com email duplicado (deve falhar)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Outro Usuário",
+  "email": "joao@email.com",
+  "password": "123456"
+}
+
+# Resposta esperada: 400 Bad Request
+# { "message": "Email já cadastrado" }
+
+### Login com senha errada (deve falhar)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "joao@email.com",
+  "password": "senha-errada"
+}
+
+# Resposta esperada: 401 Unauthorized
+# { "message": "Email ou senha inválidos" }
+
+###############################################
+### FLUXO COMPLETO DE TESTE
+###############################################
+
+### 1. Cadastrar Usuário 1
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Usuário 1",
+  "email": "user1@email.com",
+  "password": "123456"
+}
+
+### 2. Criar task para Usuário 1 (copie o token da resposta anterior)
+POST {{baseUrl}}/api/tasks
+Authorization: Bearer COLE-O-TOKEN-AQUI
+Content-Type: application/json
+
+{
+  "title": "Task do Usuário 1",
+  "isCompleted": false,
+  "category": 0,
+  "priority": 1,
+  "order": 0
+}
+
+### 3. Cadastrar Usuário 2
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Usuário 2",
+  "email": "user2@email.com",
+  "password": "123456"
+}
+
+### 4. Listar tasks do Usuário 2 (deve estar vazio)
+GET {{baseUrl}}/api/tasks
+Authorization: Bearer COLE-O-TOKEN-DO-USER2-AQUI
+
+### 5. Criar task para Usuário 2
+POST {{baseUrl}}/api/tasks
+Authorization: Bearer COLE-O-TOKEN-DO-USER2-AQUI
+Content-Type: application/json
+
+{
+  "title": "Task do Usuário 2",
+  "isCompleted": false,
+  "category": 0,
+  "priority": 1,
+  "order": 0
+}
+
+### 6. Verificar que Usuário 1 só vê suas tasks
+GET {{baseUrl}}/api/tasks
+Authorization: Bearer TOKEN-DO-USER1
+
+### 7. Verificar que Usuário 2 só vê suas tasks
+GET {{baseUrl}}/api/tasks
+Authorization: Bearer TOKEN-DO-USER2
+
+###############################################
+### COMO USAR ESTE ARQUIVO
+###############################################
+
+# Opção 1: REST Client (VS Code Extension)
+# 1. Instale a extensão "REST Client" no VS Code
+# 2. Abra este arquivo
+# 3. Clique em "Send Request" acima de cada requisição
+
+# Opção 2: Postman
+# 1. Importe este arquivo no Postman
+# 2. Execute cada requisição manualmente
+# 3. Copie e cole os tokens quando necessário
+
+# Opção 3: cURL (terminal)
+# Cadastro:
+# curl -X POST http://localhost:5340/api/auth/register \
+#   -H "Content-Type: application/json" \
+#   -d '{"name":"João Silva","email":"joao@email.com","password":"123456"}'
+
+# Login:
+# curl -X POST http://localhost:5340/api/auth/login \
+#   -H "Content-Type: application/json" \
+#   -d '{"email":"joao@email.com","password":"123456"}'
+
+# Listar tasks (substitua TOKEN):
+# curl -X GET http://localhost:5340/api/tasks \
+#   -H "Authorization: Bearer TOKEN"

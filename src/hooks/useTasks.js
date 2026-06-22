@@ -55,10 +55,10 @@ export function useTasks(taskService) {
   }, [taskService]);
 
   const addTask = useCallback(
-    async (title) => {
+    async (title, category, priority) => {
       try {
         setError(null);
-        const newTask = await taskService.createTask(title);
+        const newTask = await taskService.createTask(title, category, priority);
         setTasks((prevTasks) => [...prevTasks, newTask]);
         return newTask;
       } catch (err) {

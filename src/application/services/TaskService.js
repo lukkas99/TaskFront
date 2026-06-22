@@ -13,8 +13,8 @@ export class TaskService {
     return await this.taskRepository.getAll();
   }
 
-  async createTask(title) {
-    const task = new Task(null, title, false);
+  async createTask(title, category, priority) {
+    const task = new Task(null, title, false, category, priority);
 
     if (!task.isValid()) {
       throw new Error("Tarefa inválida: o título não pode estar vazio");
